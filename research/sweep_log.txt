@@ -1,0 +1,202 @@
+Total configs to run: 6 x 4 x 3 = 72
+--- ETTm1 | H=96 | C=512 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 96 --context 512 --score_mode unified --refit 1 --ridge 1e-5 --stride_test 96
+  > unified: MSE=2.9326
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 96 --context 512 --mode sparsegpt --refit 1 --stride_test 96
+  > sparsegpt: MSE=3.1472
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 96 --context 512 --mode magnitude --refit 0 --stride_test 96
+  > magnitude: MSE=4.0783
+--- ETTm1 | H=96 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 96 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --stride_test 96
+  > unified: MSE=3.1425
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 96 --context 1024 --mode sparsegpt --refit 1 --stride_test 96
+  > sparsegpt: MSE=3.1698
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 96 --context 1024 --mode magnitude --refit 0 --stride_test 96
+  > magnitude: MSE=3.1583
+--- ETTm1 | H=96 | C=2048 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 96 --context 2048 --score_mode unified --refit 1 --ridge 1e-5 --stride_test 96
+  > unified: MSE=2.8554
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 96 --context 2048 --mode sparsegpt --refit 1 --stride_test 96
+  > sparsegpt: MSE=2.9844
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 96 --context 2048 --mode magnitude --refit 0 --stride_test 96
+  > magnitude: MSE=3.8521
+--- ETTm1 | H=192 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 192 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 192
+  > unified: MSE=4.9361
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 192 --context 1024 --mode sparsegpt --refit 1 --stride_test 192
+  > sparsegpt: MSE=4.9588
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 192 --context 1024 --mode magnitude --refit 0 --stride_test 192
+  > magnitude: MSE=4.7012
+--- ETTm1 | H=336 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 336 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 336
+  > unified: MSE=8.3065
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 336 --context 1024 --mode sparsegpt --refit 1 --stride_test 336
+  > sparsegpt: MSE=6.8528
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 336 --context 1024 --mode magnitude --refit 0 --stride_test 336
+  > magnitude: MSE=6.4846
+--- ETTm1 | H=720 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 720 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 720
+  > unified: MSE=6.7674
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 720 --context 1024 --mode sparsegpt --refit 1 --stride_test 720
+  > sparsegpt: MSE=6.9087
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 720 --context 1024 --mode magnitude --refit 0 --stride_test 720
+  > magnitude: MSE=6.3378
+--- ETTm2 | H=96 | C=512 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 96 --context 512 --score_mode unified --refit 1 --ridge 1e-5 --stride_test 96
+  > unified: MSE=18.7139
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 96 --context 512 --mode sparsegpt --refit 1 --stride_test 96
+  > sparsegpt: MSE=20.7365
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 96 --context 512 --mode magnitude --refit 0 --stride_test 96
+  > magnitude: MSE=24.7504
+--- ETTm2 | H=96 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 96 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --stride_test 96
+  > unified: MSE=13.7123
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 96 --context 1024 --mode sparsegpt --refit 1 --stride_test 96
+  > sparsegpt: MSE=16.8787
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 96 --context 1024 --mode magnitude --refit 0 --stride_test 96
+  > magnitude: MSE=18.3652
+--- ETTm2 | H=96 | C=2048 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 96 --context 2048 --score_mode unified --refit 1 --ridge 1e-5 --stride_test 96
+  > unified: MSE=15.9010
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 96 --context 2048 --mode sparsegpt --refit 1 --stride_test 96
+  > sparsegpt: MSE=15.9962
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 96 --context 2048 --mode magnitude --refit 0 --stride_test 96
+  > magnitude: MSE=21.9915
+--- ETTm2 | H=192 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 192 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 192
+  > unified: MSE=20.9996
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 192 --context 1024 --mode sparsegpt --refit 1 --stride_test 192
+  > sparsegpt: MSE=25.1199
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 192 --context 1024 --mode magnitude --refit 0 --stride_test 192
+  > magnitude: MSE=26.1839
+--- ETTm2 | H=336 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 336 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 336
+  > unified: MSE=36.8792
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 336 --context 1024 --mode sparsegpt --refit 1 --stride_test 336
+  > sparsegpt: MSE=32.7539
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 336 --context 1024 --mode magnitude --refit 0 --stride_test 336
+  > magnitude: MSE=34.0513
+--- ETTm2 | H=720 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 720 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 720
+  > unified: MSE=39.4732
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 720 --context 1024 --mode sparsegpt --refit 1 --stride_test 720
+  > sparsegpt: MSE=33.5669
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 720 --context 1024 --mode magnitude --refit 0 --stride_test 720
+  > magnitude: MSE=38.1903
+--- ETTh1 | H=96 | C=512 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 96 --context 512 --score_mode unified --refit 1 --ridge 1e-5 --stride_test 96
+  > unified: MSE=7.1273
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 96 --context 512 --mode sparsegpt --refit 1 --stride_test 96
+  > sparsegpt: MSE=7.3704
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 96 --context 512 --mode magnitude --refit 0 --stride_test 96
+  > magnitude: MSE=6.8564
+--- ETTh1 | H=96 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 96 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --stride_test 96
+  > unified: MSE=7.3145
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 96 --context 1024 --mode sparsegpt --refit 1 --stride_test 96
+  > sparsegpt: MSE=7.0554
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 96 --context 1024 --mode magnitude --refit 0 --stride_test 96
+  > magnitude: MSE=7.2511
+--- ETTh1 | H=96 | C=2048 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 96 --context 2048 --score_mode unified --refit 1 --ridge 1e-5 --stride_test 96
+  > unified: MSE=6.6230
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 96 --context 2048 --mode sparsegpt --refit 1 --stride_test 96
+  > sparsegpt: MSE=7.2943
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 96 --context 2048 --mode magnitude --refit 0 --stride_test 96
+  > magnitude: MSE=8.2510
+--- ETTh1 | H=192 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 192 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 192
+  > unified: MSE=7.8136
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 192 --context 1024 --mode sparsegpt --refit 1 --stride_test 192
+  > sparsegpt: MSE=7.8570
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 192 --context 1024 --mode magnitude --refit 0 --stride_test 192
+  > magnitude: MSE=8.0718
+--- ETTh1 | H=336 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 336 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 336
+  > unified: MSE=11.7357
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 336 --context 1024 --mode sparsegpt --refit 1 --stride_test 336
+  > sparsegpt: MSE=10.7797
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 336 --context 1024 --mode magnitude --refit 0 --stride_test 336
+  > magnitude: MSE=11.1819
+--- ETTh1 | H=720 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 720 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 720
+  > unified: MSE=13.1435
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 720 --context 1024 --mode sparsegpt --refit 1 --stride_test 720
+  > sparsegpt: MSE=13.3834
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh1.csv --col OT --train_end 8640 --horizon 720 --context 1024 --mode magnitude --refit 0 --stride_test 720
+  > magnitude: MSE=15.3205
+--- ETTh2 | H=96 | C=512 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 96 --context 512 --score_mode unified --refit 1 --ridge 1e-5 --stride_test 96
+  > unified: MSE=29.0096
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 96 --context 512 --mode sparsegpt --refit 1 --stride_test 96
+  > sparsegpt: MSE=29.9123
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 96 --context 512 --mode magnitude --refit 0 --stride_test 96
+  > magnitude: MSE=31.3895
+--- ETTh2 | H=96 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 96 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --stride_test 96
+  > unified: MSE=25.8848
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 96 --context 1024 --mode sparsegpt --refit 1 --stride_test 96
+  > sparsegpt: MSE=28.3535
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 96 --context 1024 --mode magnitude --refit 0 --stride_test 96
+  > magnitude: MSE=31.3772
+--- ETTh2 | H=96 | C=2048 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 96 --context 2048 --score_mode unified --refit 1 --ridge 1e-5 --stride_test 96
+  > unified: MSE=28.4125
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 96 --context 2048 --mode sparsegpt --refit 1 --stride_test 96
+  > sparsegpt: MSE=33.2289
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 96 --context 2048 --mode magnitude --refit 0 --stride_test 96
+  > magnitude: MSE=39.4899
+--- ETTh2 | H=192 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 192 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 192
+  > unified: MSE=26.9224
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 192 --context 1024 --mode sparsegpt --refit 1 --stride_test 192
+  > sparsegpt: MSE=31.8472
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 192 --context 1024 --mode magnitude --refit 0 --stride_test 192
+  > magnitude: MSE=34.7483
+--- ETTh2 | H=336 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 336 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 336
+  > unified: MSE=37.6311
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 336 --context 1024 --mode sparsegpt --refit 1 --stride_test 336
+  > sparsegpt: MSE=40.3358
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 336 --context 1024 --mode magnitude --refit 0 --stride_test 336
+  > magnitude: MSE=45.4147
+--- ETTh2 | H=720 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 720 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 720
+  > unified: MSE=43.2886
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 720 --context 1024 --mode sparsegpt --refit 1 --stride_test 720
+  > sparsegpt: MSE=52.6369
+Running: micromamba run -n timesfm311 python baselines_2of4.py --csv ETDataset/ETT-small/ETTh2.csv --col OT --train_end 8640 --horizon 720 --context 1024 --mode magnitude --refit 0 --stride_test 720
+  > magnitude: MSE=66.5106
+Total configs to run: 6 x 4 x 3 = 72
+--- ETTm1 | H=96 | C=512 ---
+--- ETTm1 | H=96 | C=1024 ---
+--- ETTm1 | H=96 | C=2048 ---
+--- ETTm1 | H=192 | C=1024 ---
+--- ETTm1 | H=336 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm1.csv --col OT --train_end 49152 --horizon 336 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0 --stride_test 336
+  > unified: MSE=8.3065
+--- ETTm1 | H=720 | C=1024 ---
+--- ETTm2 | H=96 | C=512 ---
+--- ETTm2 | H=96 | C=1024 ---
+--- ETTm2 | H=96 | C=2048 ---
+--- ETTm2 | H=192 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 192 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0.5 --stride_test 192
+  > unified: MSE=20.9996
+--- ETTm2 | H=336 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 336 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0.5 --stride_test 336
+  > unified: MSE=36.8792
+--- ETTm2 | H=720 | C=1024 ---
+Running: micromamba run -n timesfm311 python snr_2of4_signal_noise_ratio2_v1.py --csv ETDataset/ETT-small/ETTm2.csv --col OT --train_end 49152 --horizon 720 --context 1024 --score_mode unified --refit 1 --ridge 1e-5 --error_power 0.5 --stride_test 720
+  > unified: MSE=39.4732
+--- ETTh1 | H=96 | C=512 ---
+--- ETTh1 | H=96 | C=1024 ---
+--- ETTh1 | H=96 | C=2048 ---
+--- ETTh1 | H=192 | C=1024 ---
+--- ETTh1 | H=336 | C=1024 ---
+--- ETTh1 | H=720 | C=1024 ---
+--- ETTh2 | H=96 | C=512 ---
+--- ETTh2 | H=96 | C=1024 ---
+--- ETTh2 | H=96 | C=2048 ---
+--- ETTh2 | H=192 | C=1024 ---
+--- ETTh2 | H=336 | C=1024 ---
+--- ETTh2 | H=720 | C=1024 ---

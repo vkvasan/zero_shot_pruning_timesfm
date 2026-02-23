@@ -1,0 +1,59 @@
+=== CHRONOS UNIVERSAL BENCHMARK (4-WAY) ===
+Date: Sat Feb 14 09:45:16 AM UTC 2026
+-------------------------------------------
+
+DATASET: ETDataset/ETT-small/ETTm1.csv
+    [Info] Data Periodicity Confidence: 36.4%
+MAG MSE:       18.5311
+WANDA MSE:     16.4548
+SPARSEGPT MSE: 18.0191
+UNIVERSAL MSE: 16.3142
+-------------------------------------------
+
+DATASET: ETDataset/ETT-small/ETTm2.csv
+    [Info] Data Periodicity Confidence: 41.8%
+MAG MSE:       24.2031
+WANDA MSE:     18.4471
+SPARSEGPT MSE: 39.9331
+UNIVERSAL MSE: 24.6531
+-------------------------------------------
+
+DATASET: ETDataset/ETT-small/ETTh1.csv
+    [Info] Data Periodicity Confidence: 34.3%
+MAG MSE:       11.5848
+WANDA MSE:     9.0942
+SPARSEGPT MSE: 6.8178
+UNIVERSAL MSE: 6.5823
+-------------------------------------------
+
+DATASET: ETDataset/ETT-small/ETTh2.csv
+    [Info] Data Periodicity Confidence: 39.1%
+MAG MSE:       28.8570
+WANDA MSE:     11.5329
+SPARSEGPT MSE: 32.4195
+UNIVERSAL MSE: 33.2111
+-------------------------------------------
+
+DATASET: electricity/electricity.csv
+    [Info] Data Periodicity Confidence: 41.3%
+MAG MSE:       8906.3476
+WANDA MSE:     563.1418
+SPARSEGPT MSE: 808.0430
+UNIVERSAL MSE: 675.9114
+-------------------------------------------
+
+DATASET: weather/weather.csv
+    [Info] Data Periodicity Confidence: 44.5%
+MAG MSE:       746.9475
+WANDA MSE:     539.9477
+SPARSEGPT MSE: 346965.8941
+UNIVERSAL MSE: 307.6789
+-------------------------------------------
+
+DATASET: traffic/traffic.csv
+    [Info] Data Periodicity Confidence: 39.3%
+MAG MSE:       0.0007
+WANDA MSE:     0.0005
+SPARSEGPT MSE: 0.0005
+UNIVERSAL MSE: 0.0004
+-------------------------------------------

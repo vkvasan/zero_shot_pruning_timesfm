@@ -1,0 +1,37 @@
+nohup: ignoring input
+
+[1/9] ETTm1 H=336 C=1024 P=0
+  [unified-v10] per-layer ridge: min=1.00e-05 max=1.00e-02 median=2.07e-05 | noise_frac: avg=0.0772 min=0.0106 max=0.2631
+  -> MSE=6.5599 ✅ beats SparseGPT (6.85)
+
+[2/9] ETTm2 H=336 C=1024 P=0.5
+  [unified-v10] per-layer ridge: min=1.00e-05 max=1.00e-02 median=2.48e-05 | noise_frac: avg=0.0796 min=0.0142 max=0.2505
+  -> MSE=29.9347 ✅ beats SparseGPT (32.75)
+
+[3/9] ETTm2 H=720 C=1024 P=0.5
+  [unified-v10] per-layer ridge: min=1.00e-05 max=1.00e-02 median=1.93e-05 | noise_frac: avg=0.0748 min=0.0129 max=0.2510
+  -> MSE=33.8210 ❌ loses to SparseGPT (33.57)
+
+[4/9] ETTh1 H=336 C=1024 P=0
+  [unified-v10] per-layer ridge: min=1.00e-05 max=1.00e-02 median=1.36e-05 | noise_frac: avg=0.0683 min=0.0106 max=0.2661
+  -> MSE=12.3781 ❌ loses to SparseGPT (10.78)
+
+[5/9] ETTh1 H=96 C=1024 P=1.0
+  [unified-v10] per-layer ridge: min=1.00e-05 max=1.00e-02 median=1.40e-05 | noise_frac: avg=0.0692 min=0.0106 max=0.2724
+  -> MSE=8.3464 ❌ loses to SparseGPT (7.06)
+
+[6/9] ETTm1 H=96 C=1024 P=1.0
+  [unified-v10] per-layer ridge: min=1.00e-05 max=1.00e-02 median=2.15e-05 | noise_frac: avg=0.0776 min=0.0104 max=0.2646
+  -> MSE=3.2865 ❌ loses to SparseGPT (3.17)
+
+[7/9] ETTm2 H=96 C=1024 P=1.0
+  [unified-v10] per-layer ridge: min=1.00e-05 max=7.67e-03 median=2.63e-05 | noise_frac: avg=0.0810 min=0.0146 max=0.2423
+  -> MSE=16.4471 ✅ beats SparseGPT (16.88)
+
+[8/9] ETTh2 H=96 C=1024 P=1.0
+  [unified-v10] per-layer ridge: min=1.00e-05 max=1.00e-02 median=1.15e-05 | noise_frac: avg=0.0760 min=0.0129 max=0.4017
+  -> MSE=32.3318 ❌ loses to SparseGPT (28.35)
+
+[9/9] ETTh2 H=720 C=1024 P=0
+  [unified-v10] per-layer ridge: min=1.00e-05 max=1.00e-02 median=1.14e-05 | noise_frac: avg=0.0746 min=0.0128 max=0.3864
+  -> MSE=63.5771 ❌ loses to SparseGPT (52.64)

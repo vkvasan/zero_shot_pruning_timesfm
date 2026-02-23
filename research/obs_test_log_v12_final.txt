@@ -1,0 +1,37 @@
+nohup: ignoring input
+
+[1/9] ETTm1 H=336 C=1024 P=0
+  [unified-v2] noise_frac: avg=0.0772 max=0.2631 → effective_ridge=1.83e-03 (base=1.00e-05)
+  -> MSE=6.5660 ✅ beats SparseGPT (6.85)
+
+[2/9] ETTm2 H=336 C=1024 P=0.5
+  [unified-v2] noise_frac: avg=0.0796 max=0.2505 → effective_ridge=1.02e-03 (base=1.00e-05)
+  -> MSE=29.8409 ✅ beats SparseGPT (32.75)
+
+[3/9] ETTm2 H=720 C=1024 P=0.5
+  [unified-v2] noise_frac: avg=0.0748 max=0.2510 → effective_ridge=1.05e-03 (base=1.00e-05)
+  -> MSE=33.9975 ❌ loses to SparseGPT (33.57)
+
+[4/9] ETTh1 H=336 C=1024 P=0
+  [unified-v2] noise_frac: avg=0.0683 max=0.2661 → effective_ridge=2.10e-03 (base=1.00e-05)
+  -> MSE=10.2595 ✅ beats SparseGPT (10.78)
+
+[5/9] ETTh1 H=96 C=1024 P=1.0
+  [unified-v2] noise_frac: avg=0.0692 max=0.2724 → effective_ridge=2.80e-03 (base=1.00e-05)
+  -> MSE=7.0540 ✅ beats SparseGPT (7.06)
+
+[6/9] ETTm1 H=96 C=1024 P=1.0
+  [unified-v2] noise_frac: avg=0.0776 max=0.2646 → effective_ridge=1.96e-03 (base=1.00e-05)
+  -> MSE=3.1721 ❌ loses to SparseGPT (3.17)
+
+[7/9] ETTm2 H=96 C=1024 P=1.0
+  [unified-v2] noise_frac: avg=0.0810 max=0.2423 → effective_ridge=7.02e-04 (base=1.00e-05)
+  -> MSE=16.4284 ✅ beats SparseGPT (16.88)
+
+[8/9] ETTh2 H=96 C=1024 P=1.0
+  [unified-v2] noise_frac: avg=0.0760 max=0.4017 → effective_ridge=1.00e-02 (base=1.00e-05)
+  -> MSE=28.3044 ✅ beats SparseGPT (28.35)
+
+[9/9] ETTh2 H=720 C=1024 P=0
+  [unified-v2] noise_frac: avg=0.0746 max=0.3864 → effective_ridge=1.00e-02 (base=1.00e-05)
+  -> MSE=53.7316 ❌ loses to SparseGPT (52.64)

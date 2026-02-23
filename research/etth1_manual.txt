@@ -1,0 +1,15 @@
+[split] total_rows=17420 train_end=8640 context=1024 horizon=96
+[train] windows=7521 calib_pool=1091
+[test]  available=80 requested=-1 start=0 using=80 stride_test=96
+[calib] eval_batch=4 calib_batch=4 gram_budget=max_calls_per_layer*calib_batch=32*4=128 => effective_K=128
+Downloaded.
+[baseline] MSE=7.314500 MAE=2.045002
+[calib] uniform weights (no labels used): power=0, select=first
+[calib] collecting grams: select=first pool=1091 K=128 (max_calls_per_layer=32)
+[calib] collected grams for 86/86 layers
+[prune] SNR 2:4: score_mode=unified, refit=True ridge=1e-05
+[unified-v2] noise_frac: avg=0.0692 max=0.2724 → effective_ridge=2.80e-03 (base=1.00e-05)
+[diag] C_layer stats over 86 layers: min=0.1450 max=0.9117 mean=0.6320 median=0.6524 stdev=0.1696
+[diag] Energy bands (layer0): trend=60.3% season=29.7% noise=10.0%
+[snr-2of4-refit] MSE=7.262692 MAE=2.063695
+[delta] ΔMSE=-0.051808  ΔMAE=+0.018694

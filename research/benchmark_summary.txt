@@ -1,0 +1,10 @@
+=== CHRONOS UNIVERSAL BENCHMARK RESULTS ===
+Date: Sat Feb 14 09:35:59 AM UTC 2026
+-------------------------------------------
+
+DATASET: ETDataset/ETT-small/ETTm1.csv
+    [Adaptive Stats] Global Spectral Confidence: 36.4%
+Magnitude MSE: 18.5311
+SparseGPT MSE: 12.9272
+Universal MSE: 12.7236
+-------------------------------------------

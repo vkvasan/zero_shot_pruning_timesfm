@@ -1,0 +1,45 @@
+nohup: ignoring input
+[1/16] ETTm1 H=336 C=1024 calib_select=first P=0
+  -> MSE=6.5992
+[2/16] ETTm1 H=336 C=1024 calib_select=last P=0
+  -> MSE=6.7643
+[3/16] ETTm2 H=336 C=1024 calib_select=first P=0.5
+  -> MSE=28.7515
+[4/16] ETTm2 H=336 C=1024 calib_select=last P=0.5
+  -> MSE=31.0435
+[5/16] ETTm2 H=720 C=1024 calib_select=first P=0.5
+  -> MSE=32.8174
+[6/16] ETTm2 H=720 C=1024 calib_select=last P=0.5
+  -> MSE=35.8711
+[7/16] ETTh1 H=336 C=1024 calib_select=first P=0
+  -> MSE=11.1034
+[8/16] ETTh1 H=336 C=1024 calib_select=last P=0
+  -> MSE=10.8238
+[9/16] ETTh1 H=96 C=1024 calib_select=first P=1.0
+  -> MSE=7.2651
+[10/16] ETTh1 H=96 C=1024 calib_select=last P=1.0
+  -> MSE=7.2889
+[11/16] ETTm1 H=96 C=1024 calib_select=first P=1.0
+  -> MSE=3.0877
+[12/16] ETTm1 H=96 C=1024 calib_select=last P=1.0
+  -> MSE=3.3542
+[13/16] ETTm2 H=96 C=1024 calib_select=first P=1.0
+  -> MSE=14.4588
+[14/16] ETTm2 H=96 C=1024 calib_select=last P=1.0
+  -> MSE=14.8981
+[15/16] ETTh2 H=720 C=1024 calib_select=first P=0
+  -> MSE=48.9661
+[16/16] ETTh2 H=720 C=1024 calib_select=last P=0
+  -> MSE=48.1239
+
+=== SUMMARY ===
+Config                         first       last          Δ       Δ%
+-----------------------------------------------------------------
+ETTh1 H=96 C=1024      7.2651     7.2889    +0.0238    +0.3% ❌
+ETTh1 H=336 C=1024     11.1034    10.8238    -0.2796    -2.5% ✅
+ETTh2 H=720 C=1024     48.9661    48.1239    -0.8422    -1.7% ✅
+ETTm1 H=96 C=1024      3.0877     3.3542    +0.2665    +8.6% ❌
+ETTm1 H=336 C=1024      6.5992     6.7643    +0.1652    +2.5% ❌
+ETTm2 H=96 C=1024     14.4588    14.8981    +0.4393    +3.0% ❌
+ETTm2 H=336 C=1024     28.7515    31.0435    +2.2921    +8.0% ❌
+ETTm2 H=720 C=1024     32.8174    35.8711    +3.0538    +9.3% ❌
