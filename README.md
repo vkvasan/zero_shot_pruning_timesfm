@@ -9,9 +9,19 @@ This repository contains the implementation and experimental verification of **U
 - **Comprehensive Benchmarks**: Tools to execute a full 144-configuration Grid (Unified vs Wanda vs SparseGPT vs Magnitude) across all ETT datasets.
 - **Automated Reporting**: Visual and document-based result synthesis.
 
-## 📊 Performance Statistics
+## 📈 Experimental Evidence
 
-Unified v13 consistently outperforms traditional baselines across diverse benchmarks:
+Unified v13 consistently outperforms traditional baselines across diverse benchmarks. Below are the comparative results showing MSE vs. Horizon and Context.
+
+### Performance Gallery
+| Dataset | MSE vs Horizon (Context=1024) | MSE vs Context (Horizon=96) |
+| :--- | :--- | :--- |
+| **ETTm1** | ![ETTm1 Horizon](results/plots/plot_ETTm1_horizon.png) | ![ETTm1 Context](results/plots/plot_ETTm1_context.png) |
+| **ETTm2** | ![ETTm2 Horizon](results/plots/plot_ETTm2_horizon.png) | ![ETTm2 Context](results/plots/plot_ETTm2_context.png) |
+| **ETTh1** | ![ETTh1 Horizon](results/plots/plot_ETTh1_horizon.png) | ![ETTh1 Context](results/plots/plot_ETTh1_context.png) |
+| **ETTh2** | ![ETTh2 Horizon](results/plots/plot_ETTh2_horizon.png) | ![ETTh2 Context](results/plots/plot_ETTh2_context.png) |
+
+## 📊 Performance Statistics
 - **83% Win Rate** against Wanda.
 - **58% Win Rate** against SparseGPT.
 - **23% MSE Improvement** on ETTm1 (H=336, C=2048) by preventing refit-driven hallucinations.
