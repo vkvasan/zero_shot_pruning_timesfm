@@ -1,0 +1,218 @@
+{
+  "config": {
+    "csv": "ETDataset/ETT-small/ETTm2.csv",
+    "col": "OT",
+    "train_end": 49152,
+    "context": 1024,
+    "horizon": 192,
+    "stride_test": 192,
+    "eval_windows": 32
+  },
+  "metrics": {
+    "dense_eval_mse": 20.91547966003418,
+    "dense_eval_mae": 3.281466245651245,
+    "unified_eval_mse": 21.98630714416504,
+    "unified_eval_mae": 3.5786006450653076,
+    "unified_delta_mse": 1.0708274841308594,
+    "avg_nsr": 0.20446603641831085
+  },
+  "counts": {
+    "layers": 86,
+    "layer_kind": {
+      "tokenizer": 3,
+      "attn_qkv": 20,
+      "attn_out": 20,
+      "ff0": 20,
+      "ff1": 20,
+      "output_proj": 3
+    },
+    "best_expert_eval": {
+      "MAG": 32,
+      "SNR": 12,
+      "OBS": 19,
+      "Wanda": 23
+    }
+  },
+  "top_gains": [
+    {
+      "layer": "stacked_xf.0.attn.out",
+      "layer_kind": "attn_out",
+      "current": "Wanda/refit",
+      "best": "MAG/refit",
+      "gain_vs_current_choice": 1.5120620727539062,
+      "local_nsr": 0.10151684568913685,
+      "cond_p90": 1995.8240966796875
+    },
+    {
+      "layer": "stacked_xf.2.ff0",
+      "layer_kind": "ff0",
+      "current": "Wanda/refit",
+      "best": "MAG/mask",
+      "gain_vs_current_choice": 1.202606201171875,
+      "local_nsr": 0.15191964577441033,
+      "cond_p90": 35.84210205078125
+    },
+    {
+      "layer": "stacked_xf.9.ff1",
+      "layer_kind": "ff1",
+      "current": "Wanda/refit",
+      "best": "SNR/mask",
+      "gain_vs_current_choice": 0.7285003662109375,
+      "local_nsr": 0.07788814010420844,
+      "cond_p90": 874.1766357421875
+    },
+    {
+      "layer": "tokenizer.output_layer",
+      "layer_kind": "tokenizer",
+      "current": "OBS/refit",
+      "best": "SNR/mask",
+      "gain_vs_current_choice": 0.7280654907226562,
+      "local_nsr": 1.3711242802705488,
+      "cond_p90": 2924.02099609375
+    },
+    {
+      "layer": "stacked_xf.9.attn.qkv_proj",
+      "layer_kind": "attn_qkv",
+      "current": "Wanda/refit",
+      "best": "MAG/mask",
+      "gain_vs_current_choice": 0.6896286010742188,
+      "local_nsr": 0.1664945961803132,
+      "cond_p90": 11.330957412719727
+    },
+    {
+      "layer": "stacked_xf.14.ff0",
+      "layer_kind": "ff0",
+      "current": "Wanda/refit",
+      "best": "MAG/mask",
+      "gain_vs_current_choice": 0.6865863800048828,
+      "local_nsr": 0.08349697995585684,
+      "cond_p90": 10.867134094238281
+    },
+    {
+      "layer": "stacked_xf.3.ff1",
+      "layer_kind": "ff1",
+      "current": "Wanda/refit",
+      "best": "OBS/mask",
+      "gain_vs_current_choice": 0.5205497741699219,
+      "local_nsr": 0.08746559287229323,
+      "cond_p90": 253.34228515625
+    },
+    {
+      "layer": "stacked_xf.2.attn.out",
+      "layer_kind": "attn_out",
+      "current": "Wanda/refit",
+      "best": "MAG/mask",
+      "gain_vs_current_choice": 0.47156715393066406,
+      "local_nsr": 0.22814935068390882,
+      "cond_p90": 25.904014587402344
+    },
+    {
+      "layer": "stacked_xf.12.ff0",
+      "layer_kind": "ff0",
+      "current": "Wanda/refit",
+      "best": "MAG/refit",
+      "gain_vs_current_choice": 0.3887977600097656,
+      "local_nsr": 0.06192606707435089,
+      "cond_p90": 11.118878364562988
+    },
+    {
+      "layer": "stacked_xf.9.attn.out",
+      "layer_kind": "attn_out",
+      "current": "Wanda/refit",
+      "best": "MAG/refit",
+      "gain_vs_current_choice": 0.37011146545410156,
+      "local_nsr": 0.09728417451876856,
+      "cond_p90": 11.166335105895996
+    },
+    {
+      "layer": "stacked_xf.9.ff0",
+      "layer_kind": "ff0",
+      "current": "Wanda/refit",
+      "best": "MAG/mask",
+      "gain_vs_current_choice": 0.3581695556640625,
+      "local_nsr": 0.05512724061137146,
+      "cond_p90": 15.261298179626465
+    },
+    {
+      "layer": "stacked_xf.4.attn.qkv_proj",
+      "layer_kind": "attn_qkv",
+      "current": "Wanda/refit",
+      "best": "MAG/refit",
+      "gain_vs_current_choice": 0.353759765625,
+      "local_nsr": 0.23441045223969798,
+      "cond_p90": 20.16304588317871
+    },
+    {
+      "layer": "stacked_xf.17.attn.qkv_proj",
+      "layer_kind": "attn_qkv",
+      "current": "Wanda/refit",
+      "best": "MAG/refit",
+      "gain_vs_current_choice": 0.34661102294921875,
+      "local_nsr": 0.14023969045469512,
+      "cond_p90": 9.542308807373047
+    },
+    {
+      "layer": "stacked_xf.18.attn.qkv_proj",
+      "layer_kind": "attn_qkv",
+      "current": "Wanda/refit",
+      "best": "MAG/refit",
+      "gain_vs_current_choice": 0.3434944152832031,
+      "local_nsr": 0.2541074395200496,
+      "cond_p90": 22.638723373413086
+    },
+    {
+      "layer": "stacked_xf.15.ff1",
+      "layer_kind": "ff1",
+      "current": "Wanda/refit",
+      "best": "OBS/mask",
+      "gain_vs_current_choice": 0.33516693115234375,
+      "local_nsr": 0.09775356541069445,
+      "cond_p90": 106.68989562988281
+    },
+    {
+      "layer": "stacked_xf.1.attn.out",
+      "layer_kind": "attn_out",
+      "current": "Wanda/refit",
+      "best": "SNR/refit",
+      "gain_vs_current_choice": 0.33466529846191406,
+      "local_nsr": 0.287364686929594,
+      "cond_p90": 36.677574157714844
+    },
+    {
+      "layer": "stacked_xf.11.ff1",
+      "layer_kind": "ff1",
+      "current": "Wanda/refit",
+      "best": "MAG/refit",
+      "gain_vs_current_choice": 0.2950935363769531,
+      "local_nsr": 0.08500836132338724,
+      "cond_p90": 262.0653076171875
+    },
+    {
+      "layer": "stacked_xf.3.ff0",
+      "layer_kind": "ff0",
+      "current": "Wanda/refit",
+      "best": "OBS/mask",
+      "gain_vs_current_choice": 0.2757606506347656,
+      "local_nsr": 0.281176117355076,
+      "cond_p90": 23.816547393798828
+    },
+    {
+      "layer": "stacked_xf.13.attn.qkv_proj",
+      "layer_kind": "attn_qkv",
+      "current": "Wanda/refit",
+      "best": "SNR/refit",
+      "gain_vs_current_choice": 0.2722434997558594,
+      "local_nsr": 0.15853711876407944,
+      "cond_p90": 8.564366340637207
+    },
+    {
+      "layer": "stacked_xf.5.ff1",
+      "layer_kind": "ff1",
+      "current": "Wanda/refit",
+      "best": "SNR/refit",
+      "gain_vs_current_choice": 0.2706298828125,
+      "local_nsr": 0.07480345125150847,
+      "cond_p90": 483.1095886230469
+    }
+  ]
+}

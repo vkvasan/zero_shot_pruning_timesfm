@@ -76,11 +76,29 @@ def run_cmd(cmd):
         print(f"Stderr: {e.stderr}")
         return None
 
+def get_methods():
+    wanted = os.environ.get("SWEEP_METHODS", "").strip()
+    if not wanted:
+        return METHODS
+    keep = {x.strip().lower() for x in wanted.split(",") if x.strip()}
+    return [m for m in METHODS if m[0].lower() in keep]
+
 
 
 def main():
     results = []
-    log_file = "results/restored_v13_sweep.csv"
+    log_file = os.environ.get("SWEEP_LOG_FILE", "results/restored_v13_sweep.csv")
+    methods = get_methods()
+    if not methods:
+        raise SystemExit("No methods selected. Set SWEEP_METHODS to a comma-separated subset of unified,sparsegpt,magnitude,wanda.")
+    unified_extra_flags = os.environ.get(
+        "SWEEP_UNIFIED_EXTRA_FLAGS",
+        " --max_calls_per_layer 64 --calib_select last --nf_hi 0.0 --error_power 0",
+    )
+    baseline_extra_flags = os.environ.get(
+        "SWEEP_BASELINE_EXTRA_FLAGS",
+        " --calib_windows 256 --calib_select last",
+    )
     
     # Check if exists to append? 
     write_header = not os.path.exists(log_file)
@@ -93,7 +111,7 @@ def main():
     configs = list(itertools.product(HORIZONS, CONTEXTS))
     sorted_configs = sorted(configs)
 
-    print(f"Total configs to run: {len(sorted_configs)} x {len(DATASETS)} x {len(METHODS)} = {len(sorted_configs)*len(DATASETS)*len(METHODS)}")
+    print(f"Total configs to run: {len(sorted_configs)} x {len(DATASETS)} x {len(methods)} = {len(sorted_configs)*len(DATASETS)*len(methods)}")
 
     for dataset in DATASETS:
         train_end = TRAIN_ENDS[dataset]
@@ -102,15 +120,15 @@ def main():
         for (h, c) in sorted_configs:
             print(f"--- {dataset} | H={h} | C={c} ---")
             
-            for method_name, script, args_str in METHODS:
+            for method_name, script, args_str in methods:
                 if is_completed(log_file, dataset, method_name, h, c):
                     continue
 
                 # Use standardized flags validated in Phase 2
                 if method_name == "unified":
-                    extra_flags = " --max_calls_per_layer 64 --calib_select last --nf_hi 0.0 --error_power 0"
+                    extra_flags = unified_extra_flags
                 else:
-                    extra_flags = " --calib_windows 256 --calib_select last"
+                    extra_flags = baseline_extra_flags
 
                 cmd = (f"micromamba run -n timesfm311 python {script} "
                        f"--csv {csv_path} --col OT "
