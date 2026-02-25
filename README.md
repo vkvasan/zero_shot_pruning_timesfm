@@ -16,7 +16,7 @@ The branch results are tracked in a merged benchmark table built from `results/s
 
 ### Benchmark Table (Recommended View)
 
-- Full 36-config table (all datasets × horizons × contexts), with **Unified** values highlighted:
+- Full 36-config table (all datasets × horizons × contexts), with best values **bolded** and second-best values <u>underlined</u>:
   - `results/benchmark_table_postpass_best_available.md`
 - Source CSV used for the table:
   - `results/sweep_postpass_best_available.csv`
