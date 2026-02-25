@@ -14,13 +14,14 @@ This repository contains the implementation and experimental evaluation of a **p
 
 The branch results are tracked in a merged benchmark table built from `results/sweep_postpass_best_available.csv` (all-dataset post-pass sweep + targeted stronger ETTm2 reruns where available).
 
-### Benchmark Table (Recommended View)
+### Benchmark Tables (Recommended View)
 
-- Full 36-config table (all datasets × horizons × contexts), with best values **bolded** and second-best values <u>underlined</u>:
+- Pruning-technique comparison table (Unified / SparseGPT / Wanda / Magnitude only), full 36 configs, with best values **bolded** and second-best values <u>underlined</u>:
   - `results/benchmark_table_postpass_best_available.md`
-- Source CSV used for the table:
+- Dense vs Unified table (separate, full 36 configs), with best values **bolded** and second-best values <u>underlined</u>:
+  - `results/dense_vs_unified_table_postpass_best_available.md`
+- Source CSVs:
   - `results/sweep_postpass_best_available.csv`
-- Dense reference CSV used by the table:
   - `results/dense_baselines.csv`
 
 ### Optional Plots (Legacy View)
@@ -42,7 +43,8 @@ Line plots are still available in `results/plots/`, but the table above is the p
   - `run_sweep.py`: Orchestrator for full grid experimental sweeps.
   - `plot_results.py`: Legacy visualization script for sweep plots.
   - `generate_updated_graphs.py`: Merges updated results and regenerates repo-style plots.
-  - `generate_benchmark_table.py`: Builds a single markdown benchmark table from merged results.
+  - `generate_benchmark_table.py`: Builds the pruning-technique comparison markdown table.
+  - `generate_dense_vs_unified_table.py`: Builds the separate Dense-vs-Unified markdown table.
   - `generate_report.py`: Word document generator for technical specifications.
 - `results/`: Sweep CSVs, merged comparison CSVs, and generated performance plots.
 - `research/`: Legacy logs, draft implementations, and diagnostic tools.
