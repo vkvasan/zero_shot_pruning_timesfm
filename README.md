@@ -2,7 +2,7 @@
 
 This repository contains the implementation and experimental evaluation of a **pruning-time Competitive MoE** for 2:4 sparsity in TimesFM, with layer-wise expert selection across `Magnitude`, `Wanda`, `OBS`, and `SNR`-style pruning/reconstruction strategies.
 
-## 🚀 Key Features
+## Key Features
 
 - **Pruning-Time MoE Routing**: Selects the pruning expert **per layer** (and `mask/refit` variant) instead of using one global pruning method.
 - **Distribution-Aware Gating**: Uses activation / Gram statistics (e.g., NSR, conditioning, kurtosis) to bias routing and apply safe fallbacks.
@@ -10,7 +10,7 @@ This repository contains the implementation and experimental evaluation of a **p
 - **Interaction Diagnostics**: Pairwise move diagnostics and pair-aware greedy hooks for analyzing non-additive layer interactions.
 - **Benchmark + Plotting Tooling**: Full 144-config sweep support and updated plotting scripts/artifacts.
 
-## 📈 Experimental Evidence
+## Experimental Evidence
 
 The branch results are tracked in a merged benchmark table built from `results/sweep_postpass_best_available.csv` (all-dataset post-pass sweep + targeted stronger ETTm2 reruns where available).
 
@@ -25,14 +25,14 @@ The branch results are tracked in a merged benchmark table built from `results/s
 
 Line plots are still available in `results/plots/`, but the table above is the primary presentation for this branch.
 
-## 📊 Performance Statistics (Best-Available Unified)
+## Performance Statistics (Best-Available Unified)
 - **29 / 36 wins (80.6%)** vs **SparseGPT**
 - **35 / 36 wins (97.2%)** vs **Wanda**
 - **33 / 36 wins (91.7%)** vs **Magnitude**
 - **25 / 36 best-overall** configurations across `{Unified, SparseGPT, Wanda, Magnitude}`
 - Mean MSE across all 36 configs: **Unified = 16.837** vs **SparseGPT = 17.796**
 
-## 🛠 Repository Structure
+## Repository Structure
 
 - `scripts/`:
   - `prune_unified.py`: Main pruning implementation (Competitive MoE + safety/post-pass logic).
@@ -45,7 +45,7 @@ Line plots are still available in `results/plots/`, but the table above is the p
 - `results/`: Sweep CSVs, merged comparison CSVs, and generated performance plots.
 - `research/`: Legacy logs, draft implementations, and diagnostic tools.
 
-## 🏁 Getting Started
+## Getting Started
 
 ### 1. Installation
 Ensure you have a working `micromamba` or `conda` environment with Python 3.11.
