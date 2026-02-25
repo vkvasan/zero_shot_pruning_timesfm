@@ -14,29 +14,33 @@ It is **not** an inference-time neural MoE (no runtime router is added at infere
 
 ---
 
-## 2. Notation
+## 2. Notation (Plain-English)
 
-Let:
+This section defines the symbols used later, in plain terms.
 
-- \(\mathcal{L}\): set of prunable linear layers
-- \(\ell \in \mathcal{L}\): one prunable layer
-- \(W_\ell\): dense weight matrix of layer \(\ell\)
-- \(a \in \mathcal{A}_\ell\): one pruning action (expert + variant) for layer \(\ell\)
-- \(\mathcal{A}_\ell\): candidate action set for layer \(\ell\)
-- \(X_\ell\): calibration activations entering layer \(\ell\)
-- \(Y_\ell\): dense outputs of layer \(\ell\) on the same calibration activations
-- \(\widehat{Y}_\ell(a)\): outputs of pruned layer \(\ell\) using candidate action \(a\)
+- `L` (written as math `𝓛` in formulas): the list of all prunable linear layers in the model.
+  - Example: `stacked_xf.7.attn.qkv_proj`, `stacked_xf.7.ff1`, `output_projection_point.output_layer`
+- `ℓ` ("ell"): one specific layer chosen from `L`.
+- `W_ℓ`: the original dense weight matrix of layer `ℓ` (before pruning).
+- `A_ℓ` (math `𝓐_ℓ`): the set of pruning choices we consider for layer `ℓ`.
+- `a`: one pruning choice from `A_ℓ`.
+  - A pruning choice means **which expert** to use (`Magnitude`, `Wanda`, `OBS`, `SNR`) and **which variant** (`mask` or `refit`).
+- `X_ℓ`: calibration inputs going *into* layer `ℓ` (activations at that layer input).
+- `Y_ℓ`: outputs of the **dense** version of layer `ℓ` when fed `X_ℓ`.
+- `Ŷ_ℓ(a)` (read: "Y-hat for layer ell under action a"): outputs of the **pruned** layer `ℓ` using pruning choice `a`, evaluated on the same `X_ℓ`.
 
-Each action has the form:
+Pruning action format (plain text):
 
-\[
-a = (\text{expert}, \text{variant})
-\]
+`a = (expert, variant)`
 
-where:
+Where:
 
-- `expert` \(\in \{\text{Magnitude}, \text{Wanda}, \text{OBS}, \text{SNR}\}\)
-- `variant` \(\in \{\text{mask}, \text{refit}\}\)
+- `expert ∈ {Magnitude, Wanda, OBS, SNR}`
+- `variant ∈ {mask, refit}`
+
+Example:
+
+- `a = (Wanda, refit)` means: prune layer `ℓ` using Wanda-style scoring, then run local refit/reconstruction on the kept weights.
 
 ---
 
@@ -54,17 +58,13 @@ For many experts, two variants are considered:
 - **mask**: apply the 2:4 mask only
 - **refit**: apply the mask, then locally reconstruct/refit surviving weights
 
-So the per-layer decision variable is:
+So the per-layer decision is:
 
-\[
-a_\ell \in \mathcal{A}_\ell
-\]
+- `a_ℓ`: the pruning action chosen for layer `ℓ`
 
-and the global pruning policy is:
+And the full pruning policy is:
 
-\[
-\pi = \{a_\ell\}_{\ell \in \mathcal{L}}
-\]
+- `π = {a_ℓ for each prunable layer ℓ}`
 
 ---
 
