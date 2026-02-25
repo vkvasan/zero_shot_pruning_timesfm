@@ -12,15 +12,18 @@ This repository contains the implementation and experimental evaluation of a **p
 
 ## 📈 Experimental Evidence
 
-The figures below are updated from the `branch-moe-interactions` results and use the merged benchmark in `results/sweep_postpass_best_available.csv` (full all-dataset post-pass sweep plus targeted stronger ETTm2 reruns where available).
+The branch results are tracked in a merged benchmark table built from `results/sweep_postpass_best_available.csv` (all-dataset post-pass sweep + targeted stronger ETTm2 reruns where available).
 
-### Performance Gallery
-| Dataset | MSE vs Horizon (Context=1024) | MSE vs Context (Horizon=96) |
-| :--- | :--- | :--- |
-| **ETTm1** | ![ETTm1 Horizon](results/plots/plot_ETTm1_horizon.png) | ![ETTm1 Context](results/plots/plot_ETTm1_context.png) |
-| **ETTm2** | ![ETTm2 Horizon](results/plots/plot_ETTm2_horizon.png) | ![ETTm2 Context](results/plots/plot_ETTm2_context.png) |
-| **ETTh1** | ![ETTh1 Horizon](results/plots/plot_ETTh1_horizon.png) | ![ETTh1 Context](results/plots/plot_ETTh1_context.png) |
-| **ETTh2** | ![ETTh2 Horizon](results/plots/plot_ETTh2_horizon.png) | ![ETTh2 Context](results/plots/plot_ETTh2_context.png) |
+### Benchmark Table (Recommended View)
+
+- Full 36-config table (all datasets × horizons × contexts), with **Unified** values highlighted:
+  - `results/benchmark_table_postpass_best_available.md`
+- Source CSV used for the table:
+  - `results/sweep_postpass_best_available.csv`
+
+### Optional Plots (Legacy View)
+
+Line plots are still available in `results/plots/`, but the table above is the primary presentation for this branch.
 
 ## 📊 Performance Statistics (Best-Available Unified)
 - **29 / 36 wins (80.6%)** vs **SparseGPT**
@@ -37,6 +40,7 @@ The figures below are updated from the `branch-moe-interactions` results and use
   - `run_sweep.py`: Orchestrator for full grid experimental sweeps.
   - `plot_results.py`: Legacy visualization script for sweep plots.
   - `generate_updated_graphs.py`: Merges updated results and regenerates repo-style plots.
+  - `generate_benchmark_table.py`: Builds a single markdown benchmark table from merged results.
   - `generate_report.py`: Word document generator for technical specifications.
 - `results/`: Sweep CSVs, merged comparison CSVs, and generated performance plots.
 - `research/`: Legacy logs, draft implementations, and diagnostic tools.
@@ -91,6 +95,12 @@ python3 scripts/run_sweep.py
 
 ```bash
 micromamba run -n timesfm311 python scripts/generate_updated_graphs.py
+```
+
+### 5. Generating the Benchmark Table (Preferred Branch Presentation)
+
+```bash
+python3 scripts/generate_benchmark_table.py
 ```
 
 *Key result files:* `results/sweep_postpass_best_available.csv`, `results/merged_unified_postpass_fast_vs_baselines.csv`, `results/ettm2_best_available_vs_baselines.csv`.
