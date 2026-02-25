@@ -46,7 +46,7 @@ Example:
 
 ## 3. Candidate expert set (per layer)
 
-For every layer \(\ell\), the method constructs multiple 2:4 pruning candidates:
+For every layer `ℓ`, the method constructs multiple 2:4 pruning candidates:
 
 1. **Magnitude**
 2. **Wanda**
@@ -70,16 +70,16 @@ And the full pruning policy is:
 
 ## 4. Local reconstruction objective (first-stage selection)
 
-Each candidate is first evaluated with a **local reconstruction proxy** on cached activations:
+Each candidate is first evaluated with a **local reconstruction proxy** on cached activations.
 
-\[
-\mathcal{L}^{\text{local}}_\ell(a) = \frac{1}{N_\ell}\left\|Y_\ell - \widehat{Y}_\ell(a)\right\|_F^2
-\]
+Equation (local reconstruction proxy):
+
+`L_local(ℓ, a) = (1 / N_ℓ) * || Y_ℓ - Ŷ_ℓ(a) ||_F^2`
 
 where:
 
-- \(N_\ell\) is the number of calibration samples (or normalization factor)
-- \(\|\cdot\|_F\) is the Frobenius norm
+- `N_ℓ` is the number of calibration samples (or normalization factor)
+- `|| · ||_F` is the Frobenius norm
 
 This proxy is useful, but it is not the final task objective. A candidate with low local reconstruction error can still hurt **forecast MSE** once all layers are pruned.
 
@@ -87,22 +87,22 @@ This proxy is useful, but it is not the final task objective. A candidate with l
 
 ## 5. Distribution-aware gating features (layer statistics)
 
-The method computes layer-local statistics \(\phi_\ell\) from activations and Gram structure.
+The method computes layer-local statistics `φ_ℓ` from activations and Gram structure.
 
 ## 5.1 Gram statistics
 
-Given input activations \(X_\ell\), a Gram / covariance-like matrix is accumulated:
+Given input activations `X_ℓ`, a Gram / covariance-like matrix is accumulated.
 
-\[
-G_\ell = \sum_{i=1}^{N_\ell} w_i \, x_i x_i^\top
-\]
+Equation (weighted Gram accumulation):
+
+`G_ℓ = sum_{i=1..N_ℓ} [ w_i * x_i * x_i^T ]`
 
 where:
 
-- \(x_i\) is the activation vector (or group activation) for sample \(i\)
-- \(w_i\) is a calibration weight (uniform when `error_power = 0`)
+- `x_i` is the activation vector (or group activation) for sample `i`
+- `w_i` is a calibration weight (uniform when `error_power = 0`)
 
-From \(G_\ell\), the method derives features such as:
+From `G_ℓ`, the method derives features such as:
 
 - condition number (or robust percentile proxy)
 - diagonal coefficient of variation
@@ -112,46 +112,45 @@ These indicate numerical stability and refit risk.
 
 ## 5.2 Time-series / activation spectral features
 
-For each layer (or representative activations), the method estimates energy in trend/season/noise bands:
+For each layer (or representative activations), the method estimates energy in trend/season/noise bands.
 
-\[
-E_{\text{total}} = E_{\text{trend}} + E_{\text{season}} + E_{\text{noise}}
-\]
+Equation (energy decomposition):
 
-and defines a noise-to-signal ratio (NSR):
+`E_total = E_trend + E_season + E_noise`
 
-\[
-\text{NSR}_\ell = \frac{E_{\text{noise}}}{E_{\text{trend}} + E_{\text{season}} + \varepsilon}
-\]
+and defines a noise-to-signal ratio (NSR).
+
+Equation (layer NSR):
+
+`NSR_ℓ = E_noise / (E_trend + E_season + eps)`
 
 Additional features include:
 
 - activation kurtosis (heavy tails)
 - trend/season/noise fractions
 
-Collect these as:
+Collect these as a feature vector.
 
-\[
-\phi_\ell = \big[\text{NSR}_\ell,\ \text{kurtosis}_\ell,\ \text{cond}_\ell,\ \text{diagCV}_\ell,\ \text{offdiagRatio}_\ell,\ \dots \big]
-\]
+Equation (layer feature vector):
+
+`φ_ℓ = [ NSR_ℓ, kurtosis_ℓ, cond_ℓ, diagCV_ℓ, offdiagRatio_ℓ, ... ]`
 
 ---
 
 ## 6. Layer-local MoE routing (feature-biased local selection)
 
-The first-stage pruning decision is a feature-biased local selection:
+The first-stage pruning decision is a feature-biased local selection.
 
-\[
-a_\ell^{(0)} = \arg\min_{a \in \mathcal{A}_\ell}
-\left(\mathcal{L}^{\text{local}}_\ell(a) + b_\ell(a;\phi_\ell)\right)
-\]
+Equation (first-stage routing):
+
+`a_ℓ^(0) = argmin over a in A_ℓ of [ L_local(ℓ, a) + b_ℓ(a; φ_ℓ) ]`
 
 where:
 
-- \(\mathcal{L}^{\text{local}}_\ell(a)\) = local reconstruction proxy
-- \(b_\ell(a;\phi_\ell)\) = feature-based bias / penalty
+- `L_local(ℓ, a)` = local reconstruction proxy
+- `b_ℓ(a; φ_ℓ)` = feature-based bias / penalty
 
-Interpretation of \(b_\ell\):
+Interpretation of `b_ℓ`:
 
 - penalize unstable `refit` variants on ill-conditioned layers
 - favor robust experts in noisy regimes
@@ -165,21 +164,19 @@ This is the **pruning-time MoE router**: it chooses the expert/variant per layer
 
 Some layers have disproportionately high impact on forecast error. The method applies a safety policy on top of the local router.
 
-Define a risk score:
+Define a risk score.
 
-\[
-r_\ell = R(\phi_\ell,\ \text{layer\_type}_\ell,\ \text{local margins})
-\]
+Equation (risk score):
 
-If \(r_\ell\) is high and an alternative is locally competitive, the policy overrides the first-stage choice:
+`r_ℓ = R( φ_ℓ, layer_type_ℓ, local_margins )`
 
-\[
-a_\ell^{(1)} =
-\begin{cases}
-\tilde{a}_\ell, & \text{if } r_\ell > \tau \text{ and } \tilde{a}_\ell \text{ is competitive}\\
-a_\ell^{(0)}, & \text{otherwise}
-\end{cases}
-\]
+If `r_ℓ` is high and an alternative is locally competitive, the policy overrides the first-stage choice.
+
+Equation (safety override rule):
+
+`a_ℓ^(1) = a_tilde_ℓ  if (r_ℓ > tau and a_tilde_ℓ is competitive)`
+
+`a_ℓ^(1) = a_ℓ^(0)    otherwise`
 
 This is used to prevent known failure modes (e.g., noisy `qkv/ff0`, unstable `ff1`, unstable output projection refits).
 
@@ -189,37 +186,37 @@ This is used to prevent known failure modes (e.g., noisy `qkv/ff0`, unstable `ff
 
 The actual task objective is forecast MSE on held-out windows, not local reconstruction.
 
-Let \(S\) be the current set of post-pass overrides (initially empty after the first-stage policy is applied).  
-Let \(\text{MSE}(S)\) denote the forecast MSE with overrides \(S\).
+Let `S` be the current set of post-pass overrides (initially empty after the first-stage policy is applied).  
+Let `MSE(S)` denote the forecast MSE with overrides `S`.
 
-For candidate move \(i\), define its gain:
+For candidate move `i`, define its gain.
 
-\[
-\Delta_i(S) = \text{MSE}(S) - \text{MSE}(S \cup \{i\})
-\]
+Equation (single-move gain):
 
-If \(\Delta_i(S) > 0\), move \(i\) improves forecast accuracy.
+`Delta_i(S) = MSE(S) - MSE(S union {i})`
+
+If `Delta_i(S) > 0`, move `i` improves forecast accuracy.
 
 ### Greedy procedure
 
 1. Build a pool of risky candidate overrides
-2. Screen top-\(K\) moves using one-layer forecast gains
+2. Screen top-`K` moves using one-layer forecast gains
 3. Repeatedly apply the best positive-gain move
 4. Stop at a step budget or when gains fall below threshold
 
-Formally, at greedy step \(t\):
+Formally, at greedy step `t`:
 
-\[
-i_t = \arg\max_{i \in \mathcal{P}\setminus S_t} \Delta_i(S_t)
-\]
+Equation (greedy move selection):
+
+`i_t = argmax over i in (P \\ S_t) of Delta_i(S_t)`
 
 and update:
 
-\[
-S_{t+1} = S_t \cup \{i_t\}
-\]
+Equation (greedy state update):
 
-if \(\Delta_{i_t}(S_t)\) exceeds a minimum gain threshold.
+`S_(t+1) = S_t union {i_t}`
+
+if `Delta_(i_t)(S_t)` exceeds a minimum gain threshold.
 
 This stage corrects the mismatch between layer-local proxy quality and end-task forecast MSE.
 
@@ -229,28 +226,28 @@ This stage corrects the mismatch between layer-local proxy quality and end-task 
 
 Layer decisions are not additive because changing one layer changes downstream activations and later layer sensitivities.
 
-For two moves \(i\) and \(j\):
+For two moves `i` and `j`:
 
-\[
-\Delta_{i,j}(S) \neq \Delta_i(S) + \Delta_j(S)
-\]
+Equation (non-additivity):
+
+`Delta_(i,j)(S) != Delta_i(S) + Delta_j(S)`
 
 where:
 
-\[
-\Delta_{i,j}(S) = \text{MSE}(S) - \text{MSE}(S \cup \{i,j\})
-\]
+Equation (pair gain):
 
-Define exact pair synergy:
+`Delta_(i,j)(S) = MSE(S) - MSE(S union {i,j})`
 
-\[
-s^{\text{exact}}_{ij}(S) = \Delta_{i,j}(S) - \Delta_i(S) - \Delta_j(S)
-\]
+Define exact pair synergy.
+
+Equation (exact pair synergy):
+
+`s_exact_ij(S) = Delta_(i,j)(S) - Delta_i(S) - Delta_j(S)`
 
 Interpretation:
 
-- \(s^{\text{exact}}_{ij} > 0\): positive synergy (jointly better than additive)
-- \(s^{\text{exact}}_{ij} < 0\): conflict / overlap
+- `s_exact_ij > 0`: positive synergy (jointly better than additive)
+- `s_exact_ij < 0`: conflict / overlap
 
 ---
 
@@ -258,23 +255,23 @@ Interpretation:
 
 To reduce cost, the branch also estimates pair interactions from prediction deltas on the eval subset.
 
-Let \(p(S)\) be model predictions under override set \(S\).  
-Define the prediction delta for move \(i\):
+Let `p(S)` be model predictions under override set `S`.  
+Define the prediction delta for move `i`.
 
-\[
-\delta_i = p(S \cup \{i\}) - p(S)
-\]
+Equation (prediction delta for one move):
 
-A cheap proxy for synergy uses delta overlap:
+`delta_i = p(S union {i}) - p(S)`
 
-\[
-s^{\text{proxy}}_{ij} \propto - \langle \delta_i,\ \delta_j \rangle
-\]
+A cheap proxy for synergy uses delta overlap.
+
+Equation (proxy pair synergy):
+
+`s_proxy_ij is proportional to - dot(delta_i, delta_j)`
 
 Intuition:
 
-- if \(\langle \delta_i,\delta_j\rangle < 0\), the moves may cancel errors (synergy)
-- if \(\langle \delta_i,\delta_j\rangle > 0\), the moves may overlap/conflict
+- if `dot(delta_i, delta_j) < 0`, the moves may cancel errors (synergy)
+- if `dot(delta_i, delta_j) > 0`, the moves may overlap/conflict
 
 The branch can use this for diagnostics and pair-aware greedy ranking, with optional exact pair checks on a small screened set.
 
@@ -311,7 +308,7 @@ This cost is controlled by:
 
 - calibration window count
 - candidate pool size
-- screening top-\(K\)
+- screening top-`K`
 - post-pass step budget
 - eval subset size
 
