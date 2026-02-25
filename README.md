@@ -1,4 +1,4 @@
-# Unified v2 Pruning for Zero-Shot Time-Series (TimesFM)
+# Unified Pruning for Zero-Shot Time-Series (TimesFM)
 
 This repository contains the implementation and experimental evaluation of a **pruning-time Competitive MoE** for 2:4 sparsity in TimesFM, with layer-wise expert selection across `Magnitude`, `Wanda`, `OBS`, and `SNR`-style pruning/reconstruction strategies.
 
@@ -14,11 +14,11 @@ This repository contains the implementation and experimental evaluation of a **p
 
 The branch results are tracked in a merged benchmark table built from `results/sweep_postpass_best_available.csv` (all-dataset post-pass sweep + targeted stronger ETTm2 reruns where available).
 
-### Benchmark Tables (Recommended View)
+### Results Tables (Recommended View)
 
-- Pruning-technique comparison table (Unified / SparseGPT / Wanda / Magnitude only), full 36 configs, with best values **bolded** and second-best values <u>underlined</u>:
+- Table 1: Pruning-technique comparison (Unified / SparseGPT / Wanda / Magnitude only), full 36 configs, with best values **bolded** and second-best values <u>underlined</u>:
   - `results/benchmark_table_postpass_best_available.md`
-- Dense vs Unified table (separate, full 36 configs), with best values **bolded** and second-best values <u>underlined</u>:
+- Table 2: Dense vs Unified (separate, full 36 configs), with best values **bolded** and second-best values <u>underlined</u>:
   - `results/dense_vs_unified_table_postpass_best_available.md`
 - Source CSVs:
   - `results/sweep_postpass_best_available.csv`
