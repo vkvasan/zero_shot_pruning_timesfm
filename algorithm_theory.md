@@ -1,133 +1,328 @@
-# Algorithm Theory: Pruning-Time Competitive MoE for TimesFM
+# Algorithm Theory: Pruning-Time Competitive MoE (TimesFM)
 
-This document describes the algorithmic theory used in `branch-moe-interactions`.
+This document explains the algorithm used in `branch-moe-interactions` in a reader-facing form, with explicit notation and equations.
 
-## 1. Core Idea
+## 1. What the method is (and is not)
 
-The method is a **pruning-time Mixture-of-Experts (MoE)** controller over pruning algorithms.  
-It does **not** add an inference-time MoE router. The final artifact is still a **single pruned sparse model**.
+This is a **pruning-time** Mixture-of-Experts (MoE) controller over pruning algorithms.
 
-For each prunable layer, the algorithm selects among multiple pruning experts (and variants), then optionally applies a forecast-aware post-pass to improve end-task accuracy.
+- It selects the pruning strategy **per layer**.
+- It may revise some layer decisions using a small forecast-aware search.
+- It produces **one final sparse model**.
 
-## 2. Expert Set (Per Layer)
+It is **not** an inference-time neural MoE (no runtime router is added at inference).
 
-For each layer, candidate 2:4 pruning actions are generated from multiple experts:
+---
 
-- `Magnitude`
-- `Wanda`
-- `OBS` / Gram-based reconstruction
-- `SNR`-biased variants
+## 2. Notation
 
-Each expert may have two variants:
+Let:
 
-- `mask` (mask only)
-- `refit` (mask + local reconstruction/refit)
+- \(\mathcal{L}\): set of prunable linear layers
+- \(\ell \in \mathcal{L}\): one prunable layer
+- \(W_\ell\): dense weight matrix of layer \(\ell\)
+- \(a \in \mathcal{A}_\ell\): one pruning action (expert + variant) for layer \(\ell\)
+- \(\mathcal{A}_\ell\): candidate action set for layer \(\ell\)
+- \(X_\ell\): calibration activations entering layer \(\ell\)
+- \(Y_\ell\): dense outputs of layer \(\ell\) on the same calibration activations
+- \(\widehat{Y}_\ell(a)\): outputs of pruned layer \(\ell\) using candidate action \(a\)
 
-So the per-layer decision is:
-
-\[
-a_\ell \in \{(\text{expert}, \text{variant})\}
-\]
-
-## 3. Distribution-Aware Gating (Layer-Local Routing)
-
-The gate uses layer-local activation and Gram statistics gathered on calibration windows, including:
-
-- NSR / energy-band features (trend, season, noise)
-- activation kurtosis
-- Gram conditioning
-- diagonal CV and off-diagonal ratios
-
-These features are used to bias candidate selection and to detect risky layers where local reconstruction proxies are unreliable.
-
-## 4. Local Candidate Selection Objective
-
-The first-stage MoE routing uses a local reconstruction proxy plus feature-based biases/penalties:
+Each action has the form:
 
 \[
-a_\ell^{(0)} = \arg\min_{a \in \mathcal{A}_\ell}\; \mathcal{L}^{local}_\ell(a) + b_\ell(a;\phi_\ell)
+a = (\text{expert}, \text{variant})
 \]
 
 where:
 
-- \(\mathcal{L}^{local}_\ell(a)\): local reconstruction/validation loss
-- \(b_\ell(a;\phi_\ell)\): layer-local bias/penalty using distribution features \(\phi_\ell\)
+- `expert` \(\in \{\text{Magnitude}, \text{Wanda}, \text{OBS}, \text{SNR}\}\)
+- `variant` \(\in \{\text{mask}, \text{refit}\}\)
 
-This replaces brittle dataset-global routing heuristics with **layer-local** decisions.
+---
 
-## 5. Risk-Aware Safety Overrides
+## 3. Candidate expert set (per layer)
 
-Some layers contribute disproportionate forecast error despite good local proxy scores.  
-The branch adds a **safety policy** that uses distribution features to detect risky layers and revert them to safer expert/variant choices when locally competitive.
+For every layer \(\ell\), the method constructs multiple 2:4 pruning candidates:
 
-Examples:
+1. **Magnitude**
+2. **Wanda**
+3. **OBS / Gram-based**
+4. **SNR-biased variants**
 
-- noisy early `attn.qkv` / `ff0` layers
-- ill-conditioned `ff1` layers
-- unstable output projection layers
+For many experts, two variants are considered:
 
-## 6. Forecast-Aware Greedy Post-Pass
+- **mask**: apply the 2:4 mask only
+- **refit**: apply the mask, then locally reconstruct/refit surviving weights
 
-After layerwise pruning, the method runs a budgeted greedy search on a held-out forecast subset to optimize actual task MSE.
-
-For a candidate override move \(i\), define gain:
-
-\[
-\Delta_i = \text{MSE}(S) - \text{MSE}(S \cup \{i\})
-\]
-
-where \(S\) is the current set of applied overrides.
-
-Greedy post-pass:
-
-1. Build candidate overrides on risky layers
-2. Screen top-K by one-layer forecast gain
-3. Apply best positive-gain move
-4. Repeat for a small step budget
-
-This corrects local-vs-global mismatch in the first-stage routing.
-
-## 7. Interaction Effects and Pairwise Diagnostics
-
-Layer-level pruning decisions are **non-additive**:
+So the per-layer decision variable is:
 
 \[
-\Delta_{i,j} \neq \Delta_i + \Delta_j
+a_\ell \in \mathcal{A}_\ell
 \]
 
-because layer changes interact through residual pathways and downstream activations.
+and the global pruning policy is:
 
-This branch includes pairwise diagnostics for screened post-pass moves:
+\[
+\pi = \{a_\ell\}_{\ell \in \mathcal{L}}
+\]
 
-- **Proxy synergy/conflict** from prediction-delta overlap (dot products / cosine)
-- **Optional exact pair evaluations** on a small subset of move pairs
+---
 
-These diagnostics support pair-aware greedy ranking and failure analysis.
+## 4. Local reconstruction objective (first-stage selection)
 
-## 8. Why This Differs from Prior Single-Method Pruning
+Each candidate is first evaluated with a **local reconstruction proxy** on cached activations:
 
-Compared to `SparseGPT`, `Wanda`, or `Magnitude` alone, this method:
+\[
+\mathcal{L}^{\text{local}}_\ell(a) = \frac{1}{N_\ell}\left\|Y_\ell - \widehat{Y}_\ell(a)\right\|_F^2
+\]
 
-- treats pruning as a **meta-selection problem**
-- selects experts **per layer**, not globally
-- uses **distribution-aware routing**
-- applies **task-aware post-pass correction**
-- explicitly analyzes **pairwise interactions**
+where:
 
-## 9. Deployment Property
+- \(N_\ell\) is the number of calibration samples (or normalization factor)
+- \(\|\cdot\|_F\) is the Frobenius norm
 
-Despite the MoE framing, deployment remains simple:
+This proxy is useful, but it is not the final task objective. A candidate with low local reconstruction error can still hurt **forecast MSE** once all layers are pruned.
 
-- prune once
-- save one sparse model
-- no runtime router at inference
+---
 
-## 10. Branch Result Convention
+## 5. Distribution-aware gating features (layer statistics)
 
-This branch distinguishes:
+The method computes layer-local statistics \(\phi_\ell\) from activations and Gram structure.
 
-- fast all-dataset sweep (`results/unified_postpass_all_fast.csv`)
-- targeted stronger reruns (especially hard `ETTm2` configs)
-- merged best-available benchmark (`results/sweep_postpass_best_available.csv`)
+## 5.1 Gram statistics
 
-Plots and branch-level summaries should use the **best-available merged benchmark**.
+Given input activations \(X_\ell\), a Gram / covariance-like matrix is accumulated:
+
+\[
+G_\ell = \sum_{i=1}^{N_\ell} w_i \, x_i x_i^\top
+\]
+
+where:
+
+- \(x_i\) is the activation vector (or group activation) for sample \(i\)
+- \(w_i\) is a calibration weight (uniform when `error_power = 0`)
+
+From \(G_\ell\), the method derives features such as:
+
+- condition number (or robust percentile proxy)
+- diagonal coefficient of variation
+- off-diagonal / diagonal energy ratio
+
+These indicate numerical stability and refit risk.
+
+## 5.2 Time-series / activation spectral features
+
+For each layer (or representative activations), the method estimates energy in trend/season/noise bands:
+
+\[
+E_{\text{total}} = E_{\text{trend}} + E_{\text{season}} + E_{\text{noise}}
+\]
+
+and defines a noise-to-signal ratio (NSR):
+
+\[
+\text{NSR}_\ell = \frac{E_{\text{noise}}}{E_{\text{trend}} + E_{\text{season}} + \varepsilon}
+\]
+
+Additional features include:
+
+- activation kurtosis (heavy tails)
+- trend/season/noise fractions
+
+Collect these as:
+
+\[
+\phi_\ell = \big[\text{NSR}_\ell,\ \text{kurtosis}_\ell,\ \text{cond}_\ell,\ \text{diagCV}_\ell,\ \text{offdiagRatio}_\ell,\ \dots \big]
+\]
+
+---
+
+## 6. Layer-local MoE routing (feature-biased local selection)
+
+The first-stage pruning decision is a feature-biased local selection:
+
+\[
+a_\ell^{(0)} = \arg\min_{a \in \mathcal{A}_\ell}
+\left(\mathcal{L}^{\text{local}}_\ell(a) + b_\ell(a;\phi_\ell)\right)
+\]
+
+where:
+
+- \(\mathcal{L}^{\text{local}}_\ell(a)\) = local reconstruction proxy
+- \(b_\ell(a;\phi_\ell)\) = feature-based bias / penalty
+
+Interpretation of \(b_\ell\):
+
+- penalize unstable `refit` variants on ill-conditioned layers
+- favor robust experts in noisy regimes
+- avoid brittle dataset-global hard locks
+
+This is the **pruning-time MoE router**: it chooses the expert/variant per layer using local evidence + layer statistics.
+
+---
+
+## 7. Risk-aware safety overrides
+
+Some layers have disproportionately high impact on forecast error. The method applies a safety policy on top of the local router.
+
+Define a risk score:
+
+\[
+r_\ell = R(\phi_\ell,\ \text{layer\_type}_\ell,\ \text{local margins})
+\]
+
+If \(r_\ell\) is high and an alternative is locally competitive, the policy overrides the first-stage choice:
+
+\[
+a_\ell^{(1)} =
+\begin{cases}
+\tilde{a}_\ell, & \text{if } r_\ell > \tau \text{ and } \tilde{a}_\ell \text{ is competitive}\\
+a_\ell^{(0)}, & \text{otherwise}
+\end{cases}
+\]
+
+This is used to prevent known failure modes (e.g., noisy `qkv/ff0`, unstable `ff1`, unstable output projection refits).
+
+---
+
+## 8. Forecast-aware greedy post-pass (task-level correction)
+
+The actual task objective is forecast MSE on held-out windows, not local reconstruction.
+
+Let \(S\) be the current set of post-pass overrides (initially empty after the first-stage policy is applied).  
+Let \(\text{MSE}(S)\) denote the forecast MSE with overrides \(S\).
+
+For candidate move \(i\), define its gain:
+
+\[
+\Delta_i(S) = \text{MSE}(S) - \text{MSE}(S \cup \{i\})
+\]
+
+If \(\Delta_i(S) > 0\), move \(i\) improves forecast accuracy.
+
+### Greedy procedure
+
+1. Build a pool of risky candidate overrides
+2. Screen top-\(K\) moves using one-layer forecast gains
+3. Repeatedly apply the best positive-gain move
+4. Stop at a step budget or when gains fall below threshold
+
+Formally, at greedy step \(t\):
+
+\[
+i_t = \arg\max_{i \in \mathcal{P}\setminus S_t} \Delta_i(S_t)
+\]
+
+and update:
+
+\[
+S_{t+1} = S_t \cup \{i_t\}
+\]
+
+if \(\Delta_{i_t}(S_t)\) exceeds a minimum gain threshold.
+
+This stage corrects the mismatch between layer-local proxy quality and end-task forecast MSE.
+
+---
+
+## 9. Interaction effects (non-additivity across layer decisions)
+
+Layer decisions are not additive because changing one layer changes downstream activations and later layer sensitivities.
+
+For two moves \(i\) and \(j\):
+
+\[
+\Delta_{i,j}(S) \neq \Delta_i(S) + \Delta_j(S)
+\]
+
+where:
+
+\[
+\Delta_{i,j}(S) = \text{MSE}(S) - \text{MSE}(S \cup \{i,j\})
+\]
+
+Define exact pair synergy:
+
+\[
+s^{\text{exact}}_{ij}(S) = \Delta_{i,j}(S) - \Delta_i(S) - \Delta_j(S)
+\]
+
+Interpretation:
+
+- \(s^{\text{exact}}_{ij} > 0\): positive synergy (jointly better than additive)
+- \(s^{\text{exact}}_{ij} < 0\): conflict / overlap
+
+---
+
+## 10. Proxy pairwise interaction (prediction-delta geometry)
+
+To reduce cost, the branch also estimates pair interactions from prediction deltas on the eval subset.
+
+Let \(p(S)\) be model predictions under override set \(S\).  
+Define the prediction delta for move \(i\):
+
+\[
+\delta_i = p(S \cup \{i\}) - p(S)
+\]
+
+A cheap proxy for synergy uses delta overlap:
+
+\[
+s^{\text{proxy}}_{ij} \propto - \langle \delta_i,\ \delta_j \rangle
+\]
+
+Intuition:
+
+- if \(\langle \delta_i,\delta_j\rangle < 0\), the moves may cancel errors (synergy)
+- if \(\langle \delta_i,\delta_j\rangle > 0\), the moves may overlap/conflict
+
+The branch can use this for diagnostics and pair-aware greedy ranking, with optional exact pair checks on a small screened set.
+
+---
+
+## 11. Why this differs from SparseGPT / Wanda / Magnitude
+
+Single-method pruning uses one pruning rule globally (or per-layer without a task-aware controller).
+
+This method instead solves a **meta-selection** problem:
+
+1. generate multiple expert candidates per layer
+2. route per layer using distribution-aware gating
+3. apply risk-aware safety overrides
+4. correct remaining mistakes with a forecast-aware post-pass
+5. analyze pairwise interactions on hard regimes
+
+This is why the approach behaves better across mixed regimes (clean, noisy, ill-conditioned, long-context).
+
+---
+
+## 12. Deployment property and cost
+
+### Inference-time
+
+- one pruned model
+- no runtime MoE router
+- no per-token expert dispatch
+
+### Pruning-time
+
+Cost increases because the method evaluates multiple experts and runs a post-pass search.  
+This cost is controlled by:
+
+- calibration window count
+- candidate pool size
+- screening top-\(K\)
+- post-pass step budget
+- eval subset size
+
+---
+
+## 13. Practical result convention for this branch
+
+This branch uses three result tiers:
+
+1. **Baseline full sweep** (`results/restored_v13_sweep.csv`)
+2. **Unified post-pass all-dataset fast sweep** (`results/unified_postpass_all_fast.csv`)
+3. **Best-available merged benchmark** (`results/sweep_postpass_best_available.csv`)
+
+For reader-facing plots and comparisons, use the **best-available merged benchmark**.
