@@ -1390,6 +1390,7 @@ def main():
     ap.add_argument("--greedy_postpass_pairaware_alpha", type=float, default=1.0)
     ap.add_argument("--greedy_postpass_pairaware_use_exact", type=int, default=0)
     ap.add_argument("--pretrained", default="")
+    ap.add_argument("--baseline_only", type=int, default=0)
     args = ap.parse_args()
 
     pretrained_ref = args.pretrained.strip()
@@ -1436,6 +1437,8 @@ def main():
         preds_b.append(forecast_timesfm_point(tfm, X_test[i:i+args.batch], args.horizon))
     mse_b, mae_b = mse_mae(np.concatenate(preds_b, 0), Y_test)
     print(f"[baseline] MSE={mse_b:.6f} MAE={mae_b:.6f}")
+    if bool(args.baseline_only):
+        return
 
     # Stats
     X_pool = X_train[-1024:] if args.calib_select == "last" else X_train[:1024]
