@@ -1,74 +1,178 @@
-# Technical Specification: Unified v2 Pruning
+# Technical Specification: Pruning-Time Competitive MoE (branch-moe-interactions)
 
-This document provides the mathematical foundations and implementation details for the **Unified v2 Pruning** method, specifically focusing on the adaptive scoring and error-weighted Gram matrix accumulation.
+This document updates the algorithm theory for the current branch. The method is a **pruning-time Mixture-of-Experts (MoE) controller** that selects among multiple pruning experts (`Magnitude`, `Wanda`, `OBS`, `SNR`-biased variants) **per layer**, followed by a **forecast-aware post-pass**.
 
----
-
-## 1. Error-Weighted Gram Matrix Accumulation
-
-The transition from standard pruning to Unified v2 involves a significant shift in how we "look" at the data. We use **Error-Weighted Calibration** to bias the pruning towards windows that the model currently struggles with.
-
-### A. Weight Calculation
-For each window $i$ in the calibration set, we compute the model's baseline MSE:
-$$ e_i = \text{MSE}(\text{pred}_i, \text{target}_i) $$
-The relative error ratio is:
-$$ r_i = \frac{e_i}{\frac{1}{N}\sum_{j=1}^N e_j + \epsilon} $$
-The final weight for window $i$ is:
-$$ w_i = (r_i)^P $$
-where $P$ (default=1.0) is the `error_power`. High $P$ forces the Gram matrix to focus strictly on "hard" examples.
-
-### B. Gram Matrix Update
-The Gram matrix $G \in \mathbb{R}^{4 \times 4}$ for each 2:4 group is accumulated as a weighted sum of outer products:
-$$ G = \sum_{i \in \text{Calib}} w_i \cdot X_i X_i^T $$
-Where $X_i \in \mathbb{R}^4$ is the activation vector for that group. This differs from standard WANDA or SparseGPT, which typically use unweighted sums ($w_i = 1$).
+Unlike standard inference-time MoE, this router is used only during pruning. Deployment remains a single sparse model.
 
 ---
 
-## 2. Adaptive Unified Scoring
+## 1. Problem Formulation
 
-Unified v2 blends two metrics: **Energy Ratio** (Gram-based) and **Spectral Quality** (FFT-based).
+Let a dense TimesFM model contain prunable linear layers \(\ell \in \mathcal{L}\). For each layer, the algorithm builds a candidate set \(\mathcal{A}_\ell\) of 2:4 pruning actions:
 
-### A. Noise Fraction Estimation ($N_{frac}$)
-We compute the activation energy across frequency bands using FFT:
-*   $E_{signal} = E_{trend} + E_{season}$
-*   $E_{noise}$ = energy in the high-frequency band ($>70\%$ of Nyquist).
-$$ N_{frac} = \frac{\sum E_{noise}}{\sum (E_{signal} + E_{noise})} $$
+\[
+\mathcal{A}_\ell = \{(\text{expert}, \text{variant})\}
+\]
 
-### B. Blending Factor ($\alpha$)
-A sigmoid-like transition determines the reliance on spectral data:
-$$ \alpha = \text{clamp}\left(\frac{N_{frac} - 0.15}{0.15}, 0, 1\right) $$
-*   **Clean ($N_{frac} < 15\%$)**: $\alpha = 0$ (Pure Gram Ratio)
-*   **Noisy ($N_{frac} > 30\%$)**: $\alpha = 1$ (Pure Spectral Quality)
+where:
+- `expert` ∈ {`Magnitude`, `Wanda`, `OBS`, `SNR`}
+- `variant` ∈ {`mask`, `refit`}
 
-### C. The Unified Score
-$$ S_{unified} = \alpha \cdot \text{Z}(\text{Score}_{spectral}) + (1-\alpha) \cdot \text{Z}(\text{Score}_{ratio}) $$
-Where $\text{Z}(\cdot)$ is Z-normalization across the layer groups, and:
-$$ \text{Score}_{ratio} = \frac{\mathbf{W}_k^T G \mathbf{W}_k}{\mathbf{W}_d^T G \mathbf{W}_d + \epsilon} $$
-(Energy in kept weights vs. energy in dropped weights).
+The pruning controller chooses one action per layer:
+
+\[
+\pi = \{a_\ell\}_{\ell \in \mathcal{L}}
+\]
+
+to minimize downstream forecast error (MSE) under a sparsity constraint.
 
 ---
 
-## 3. Auto-Ridge Regularization
+## 2. Candidate Generation and Local Reconstruction Objective
 
-For refitting the weights, we solve the reconstruction problem via the inverse Hessian.
-The effective ridge $\lambda_{eff}$ is calculated globally:
+For each layer, multiple pruning masks/reconstructions are generated using expert-specific scores. For a candidate \(a \in \mathcal{A}_\ell\), the local proxy objective is a reconstruction loss on cached activations:
 
-$$ \lambda_{eff} = \lambda_{base} \cdot 10^{3 \cdot \text{clamp}(\frac{\max(N_{frac}) - 0.15}{0.15}, 0, 1)} $$
+\[
+\mathcal{L}^{\text{local}}_\ell(a) = \|Y_\ell - \hat{Y}_\ell(a)\|_2^2
+\]
 
-This scales the ridge from $10^{-5}$ to $10^{-2}$ if any layer in the dataset exhibits high noise.
+where \(Y_\ell\) is the dense layer output on calibration activations and \(\hat{Y}_\ell(a)\) is the candidate pruned/reconstructed output.
 
----
-
-## 4. Long Horizon Heuristic & Tuning
-For prediction horizons $H > 100$, the dense model's error signal becomes too noisy for effective calibration in some cases.
-
-*   **General Rule**: Set `error_power = 0` (Uniform Weighting). This stabilizes training and prevents performance spikes (observed in ETTm1/ETTh2).
-*   **Refinement (ETTm2)**: For ETTm2, uniform weighting underperforms ($MSE \approx 37$). Tuning revealed that preserving some error information ($P=0.5$) is optimal, recovering performance to $MSE \approx 28.75$.
-*   **Implementation**: `run_sweep.py` applies `P=0.5` for ETTm2 and `P=0` for others when $H > 100$.
+This proxy is useful but imperfect: low local reconstruction error does not always imply low forecast MSE after all layers are pruned.
 
 ---
 
-## 5. Why it Works
-1.  **Gram Weights** ensure the pruned mask is optimized for the model's failure cases.
-2.  **Spectral Blending** prevents the Gram matrix from "hallucinating" structure in pure noise.
-3.  **Auto-Ridge** prevents the refit from aggressively fitting to noisy activation patterns.
+## 3. Distribution-Aware Gating Features
+
+The controller computes activation and Gram statistics per layer during calibration:
+
+### 3.1 Activation/Time-Series Features
+- **NSR (noise-to-signal ratio)** from energy-band decomposition
+- **Trend / season / noise fractions**
+- **Activation kurtosis** (heavy-tail behavior)
+
+### 3.2 Gram/Conditioning Features
+- **Condition number** (e.g., high percentiles of local Gram conditioning)
+- **Diagonal coefficient of variation (CV)**
+- **Off-diagonal / diagonal energy ratio**
+
+These features form \(\phi_\ell\), a per-layer summary used to bias expert selection and identify risky layers.
+
+---
+
+## 4. Pruning-Time MoE Routing (Layer-Local Selection)
+
+The first-stage selection chooses a candidate by combining the local proxy with feature-dependent biases/penalties:
+
+\[
+a_\ell^{(0)} = \arg\min_{a \in \mathcal{A}_\ell}
+\Big(\mathcal{L}^{\text{local}}_\ell(a) + b(a; \phi_\ell)\Big)
+\]
+
+Where \(b(a; \phi_\ell)\) is a layer-local prior/penalty that can:
+- downweight unstable refits on ill-conditioned layers
+- favor robust experts in noisy regimes
+- avoid brittle dataset-global hard locks
+
+This branch replaces earlier global heuristics with **layer-local** gating logic.
+
+---
+
+## 5. Risk-Aware Safety Policy (Layer-Level Reversion)
+
+Empirically, a small subset of layers contributes disproportionate forecast error. The safety policy detects these risky layers using \(\phi_\ell\) and reverts them to safer expert/variant choices when locally competitive.
+
+Examples of high-risk patterns:
+- noisy early `attn.qkv` / `ff0` layers
+- ill-conditioned `ff1` layers
+- output projection layers with unstable refit behavior
+
+This acts as a low-cost guardrail before running the post-pass.
+
+---
+
+## 6. Forecast-Aware Greedy Post-Pass (Task Objective Correction)
+
+After layerwise routing, the branch runs a budgeted greedy search on a held-out subset of evaluation windows.
+
+Let \(S\) be the currently selected override set and let \(MSE(S)\) be the forecast MSE with those overrides applied. For a candidate move \(i\):
+
+\[
+\Delta_i = MSE(S) - MSE(S \cup \{i\})
+\]
+
+Algorithm:
+1. Build a risky candidate pool (top-K layers / overrides)
+2. Screen by one-layer forecast gain on a small eval subset
+3. Apply the best positive-gain move
+4. Repeat for a fixed number of steps
+
+This directly targets forecast error and corrects mistakes from local reconstruction proxies.
+
+---
+
+## 7. Pairwise Interaction Diagnostics (Non-Additivity)
+
+Layer decisions interact through residual pathways and downstream activations. Therefore:
+
+\[
+\Delta_{i,j} \neq \Delta_i + \Delta_j
+\]
+
+The branch includes pairwise diagnostics for screened post-pass moves:
+
+### 7.1 Proxy Interaction (Prediction-Delta Geometry)
+For move \(i\), let \(\delta_i\) be the change in model predictions on the eval subset. A proxy synergy score is derived from overlap:
+
+\[
+s^{proxy}_{ij} \propto -\langle \delta_i, \delta_j \rangle
+\]
+
+- negative dot product → potential synergy (error cancellation)
+- positive dot product → potential conflict / overlap
+
+### 7.2 Exact Pair Evaluation (Optional)
+For a small subset of move pairs, exact pair MSE is computed:
+
+\[
+s^{exact}_{ij} = \big(MSE(\emptyset)-MSE(\{i,j\})\big)-\Delta_i-\Delta_j
+\]
+
+This is used for diagnostics and pair-aware greedy ranking.
+
+---
+
+## 8. Practical Implications
+
+### Why this works better than a single pruning method
+- Different layer types prefer different experts (`qkv`, `attn.out`, `ff0`, `ff1`, output heads)
+- The best choice depends on activation distribution and conditioning, not just weights
+- Forecast-aware post-pass repairs the local-vs-global objective mismatch
+
+### What remains hard
+- Some `ETTm2` regimes still benefit from stronger post-pass budgets
+- Pairwise proxy signs can disagree with exact pair synergy on some moves
+- Candidate quality still limits gains when a `SparseGPT`-style solution is not in the candidate set
+
+---
+
+## 9. Deployment and Complexity
+
+- **Training-time / pruning-time cost increases** due to multi-expert evaluation and post-pass search
+- **Inference-time cost does not increase** (single pruned model, no router)
+- Post-pass cost is controllable via:
+  - eval subset size
+  - screened pool size
+  - greedy step budget
+  - candidate cap per layer
+
+---
+
+## 10. Result Reporting (Current Branch Convention)
+
+This branch distinguishes:
+- **all-dataset fast sweep** (`results/unified_postpass_all_fast.csv`)
+- **targeted strong reruns** (especially for hard `ETTm2` configs)
+- **best-available merged result** (`results/sweep_postpass_best_available.csv`)
+
+For branch-level plots and README summaries, use the **best-available merged result**.

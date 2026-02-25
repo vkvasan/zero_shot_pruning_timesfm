@@ -1,44 +1,70 @@
-# Unified v2 Pruning: Robustness via Spectral Noise Awareness
+# Competitive MoE Pruning (TimesFM): Updated Theory Summary
 
-**TL;DR**: Standard pruning metrics (Magnitude, Wanda, SparseGPT) fail on noisy time-series data because the "signal" they maximize is often corrupted by noise. **Unified v2** estimates the Signal-to-Noise Ratio (SNR) of activations per layer and adapts both the **pruning metric** and the **refit regularization** accordingly.
-
----
-
-## 1. The Core Problem: Noise Corrupts Pruning
-
-Traditional metrics assume data is clean signal. On noisy datasets (e.g., **ETTh2**, 27% noise), they fail catastrophically:
-*   **Magnitude**: Prunes small weights that might be critical for weak signals. (Result: **+5.5 MSE**)
-*   **Wanda / SparseGPT**: Rely on the input covariance matrix $X^T X$, which becomes dominated by noise variance. (Result: **+5.2 MSE**, **+2.5 MSE**)
-
-## 2. Solution: Unified v2 Mechanism
-
-The method computes the **Noise Energy Fraction** ($N_{frac}$) of activations per layer using FFT. It then adapts two components dynamically:
-
-### A. Adaptive Scoring (The "Gate")
-
-Instead of a fixed metric, we blend two scores based on layer quality:
-$$ Score_{unified} = \alpha \cdot Score_{spectral} + (1 - \alpha) \cdot Score_{ratio} $$
-
-*   **Clean Layers ($N_{frac} < 15\%$)**: $\alpha \approx 0$. Use **Pure Gram Ratio** ($E_{keep} / E_{drop}$). Preserves exact ranking of standard techniques. (Example: **ETTm1/m2**)
-*   **Noisy Layers ($N_{frac} > 30\%$)**: $\alpha \rightarrow 1$. Blend in **Spectral Quality** ($E_{trend+season} / E_{noise}$). Bypasses the noisy covariance matrix entirely. (Example: **ETTh2**)
-
-### B. Auto-Ridge Refit (The "Stabilizer")
-
-Standard refit algorithms (Optimal Brain Surgeon) invert the Hessian $H = X^T X + \lambda I$. If $H$ is noisy, the inverse explodes. Unified v2 auto-scales $\lambda$:
-
-*   Detects **Max Dataset Noise** ($N_{max}$) across all layers.
-*   If $N_{max} > 15\%$, scale $\lambda$ exponentially: $10^{-5} \rightarrow 10^{-2}$.
-*   **Result**: Constrains the refit to be conservative on noisy data.
+**TL;DR**: This branch treats pruning as a **meta-selection problem**. Instead of committing to one global pruning method (e.g., SparseGPT, Wanda, Magnitude), it selects the **best pruning expert per layer**, then uses a **forecast-aware greedy post-pass** to correct layer decisions that look good locally but hurt end-task forecast accuracy.
 
 ---
 
-## 3. Results: Consistent Wins (MSE Comparison)
+## 1) What changed from the older “Unified v2/v13” story?
 
-Unified v2 is the **only method** to provide the best MSE across all 4 benchmark datasets.
+The earlier description emphasized a single unified score (spectral + Gram blending).  
+The current branch is more general:
 
-| Dataset | **Unified v2** | SparseGPT | Magnitude | WANDA | Verdict |
-|---|---|---|---|---|---|
-| **ETTm1** | **-0.14** | +0.03 | +0.02 | +0.49 | ✅ Best |
-| **ETTm2** | **-0.18** | +3.17 | +4.65 | +6.39 | 🎉 **Breakthrough** |
-| **ETTh1** | **-0.31** | -0.26 | -0.06 | +0.44 | 🎉 **2.1× Better** |
-| **ETTh2** | **+0.61** | +2.47 | +5.49 | +5.16 | ✅ **Robust** |
+- **Multi-expert candidate set** (`Magnitude`, `Wanda`, `OBS`, `SNR`-biased)
+- **Layer-local routing** using activation/Gram statistics
+- **Risk-aware safe fallbacks**
+- **Forecast-aware multi-layer post-pass**
+- **Pairwise interaction diagnostics** (synergy/conflict between layer moves)
+
+This is why the method is better described as a **pruning-time Competitive MoE**.
+
+---
+
+## 2) Core intuition
+
+Different layer types respond differently to pruning:
+
+- `attn.qkv` often prefers robust/noise-aware choices in some regimes
+- `attn.out` and `ff0` may prefer simpler masks in others
+- `ff1` can be highly ill-conditioned and refit-sensitive
+- output projection layers can be numerically unstable
+
+A single pruning method is too rigid. The branch learns to route per layer based on observed activation distributions.
+
+---
+
+## 3) Why local pruning metrics are not enough
+
+Local reconstruction error is useful for ranking candidates, but forecast accuracy depends on **all layers together**.  
+Two issues follow:
+
+1. **Proxy mismatch**: the locally best candidate can still increase forecast MSE
+2. **Interaction effects**: gains are non-additive across layers
+
+The branch addresses these with:
+- a **safety policy** (revert risky layers)
+- a **greedy post-pass** (optimize actual forecast MSE)
+- **pairwise diagnostics** (measure synergy/conflict)
+
+---
+
+## 4) Why the MoE framing is useful
+
+The MoE framing is not for runtime inference routing. It is a way to formalize:
+
+- a shared **candidate pool of experts**
+- a **gate** (layer-local routing)
+- a **critic / post-pass** (forecast-level correction)
+
+Result: the system keeps the deployment simplicity of one pruned model while exploiting the strengths of multiple pruning algorithms.
+
+---
+
+## 5) Practical takeaway
+
+The current branch performs best when you think in **three layers of control**:
+
+1. **Expert generation** (MAG / Wanda / OBS / SNR candidates)
+2. **Distribution-aware routing** (layer-local gate + safety rules)
+3. **Forecast-aware correction** (greedy post-pass, optionally pair-aware)
+
+That is the algorithmic theory to carry forward in docs, plots, and comparisons.
